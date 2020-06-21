@@ -2,8 +2,6 @@
 
 ![Demo](/assets/images/demo2.gif)
 
-
-
 ## Installation
 ### Clone
 Clone the repository to your local machine `https://github.com/kevcen/audiovisualiser`
