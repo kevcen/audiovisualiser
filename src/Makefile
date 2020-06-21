@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = `pkg-config --cflags fftw3 sdl2`
+CFLAGS = `sdl2-config --cflags`
 CFLAGS += -Wall -Wextra -g -std=c99
 INC = -Iutils/audioProcessing -Iutils -Iutils/fft -Iutils/visualiser -Iutils/gui
 CFLAGS += $(INC)
-LDFLAGS =`pkg-config --libs fftw3 sdl2`
-LDFLAGS += -lm -lSDL2_ttf
+LDFLAGS =`sdl2-config --libs`
+LDFLAGS += -lm -lSDL2_ttf -lfftw3
 OBJS = main.o utils/audioProcessing/audioData.o utils/audioProcessing/sampler.o utils/audioProcessing/wavProcessor.o utils/fft/fftCalculator.o utils/visualiser/visualiser.o  utils/gui/gui.o utils/gui/playButton.o utils/gui/colourPicker.o utils/gui/audioText.o
 
 all: main
