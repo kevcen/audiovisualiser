@@ -1,6 +1,6 @@
 # Audio Spectrum Visualiser
 
-![Demo](/assets/images/demo.gif)
+![Demo](/assets/images/demo2.gif)
 
 
 
