@@ -2,10 +2,10 @@
 #include "playButton.h"
 #include "audioText.h"
 
-void prepareGUI(dataHandler_t *dataHandler, bool terminal){
+void prepareGUI(dataHandler_t *dataHandler){
   gui_t *gui = dataHandler->gui;
   // Initialise SDL library to be used
-  if (SDL_Init(terminal ? SDL_INIT_AUDIO : (SDL_INIT_AUDIO | SDL_INIT_VIDEO))) {
+  if (SDL_Init(dataHandler->outputType != GUI ? SDL_INIT_AUDIO : (SDL_INIT_AUDIO | SDL_INIT_VIDEO))) {
     SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
     exit(EXIT_FAILURE);
   }
@@ -16,7 +16,7 @@ void prepareGUI(dataHandler_t *dataHandler, bool terminal){
   }
 
   // Setup the gui struct
-  if(!terminal) {
+  if(dataHandler->outputType == GUI) {
     gui->window = SDL_CreateWindow(
             "Vibes, only vibes and nothing but the vibes",
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,

@@ -4,7 +4,7 @@ CFLAGS += -Wall -Wextra -g -std=c99
 INC = -I../ -I../audioProcessing
 CFLAGS += $(INC)
 
-RGB_LIB_DISTRIBUTION=../../rpi-rgb-led-matrix
+RGB_LIB_DISTRIBUTION=../../../rpi-rgb-led-matrix
 RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 
 playButton.o: playButton.c playButton.h ../dataHandler.h gui.h ../audioProcessing/audioData.h ../settings.h colourPicker.h

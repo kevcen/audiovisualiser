@@ -4,7 +4,24 @@
 #include "gui.h"
 #include "audioText.h"
 
-
+bool lookForPeaks(double audioPeak, audioData_t *audioData) {
+  bool peak = false;
+  printf("%f\n", audioPeak);
+  if (!audioData->peakOn && audioData->peakCounter < PEAK_SIZE &&
+      ((audioPeak > PEAK_THRESHOLD && audioData->localMax) || (audioPeak > PEAK_ALL_THRESHOLD && !audioData->localMax))) {
+    audioData->peakOn = true;
+    //nextTheme(colourList);
+    peak = true;
+  }
+  if (audioData->peakOn) {
+    audioData->peakCounter++;
+    if (audioData->peakCounter >= PEAK_SIZE) {
+      audioData->peakOn = false;
+      audioData->peakCounter = 0;
+    }
+  }
+  return peak;
+}
 
 static double updateBandBuffer(audioData_t *audioData, int band) {
   double *fftResults = &audioData->fftResults[audioData->framePosition][band];
@@ -28,28 +45,49 @@ static double updateBandBuffer(audioData_t *audioData, int band) {
   return *fftResults;
 }
 
-static void displayToPi(audioData_t *audioData) {
+static void displayToPi(dataHandler_t *dataHandler) {
+  // Retrieve data members
+  audioData_t *audioData = dataHandler->audioData;
+  colourList_t *colourList = dataHandler->colourList;
+  
   led_canvas_clear(audioData->offscreen_canvas);
 
+  double audioPeak = 0;
   // Output the height for each band
   for (int i = 0; i < NUM_OF_BINS; i++) {
     double magnitude = updateBandBuffer(audioData, i);
     double max = audioData->maxBinMagnitude[i];
-                                     
+    if (magnitude / max > audioPeak)
+      audioPeak = magnitude / max;
+                          
     // Get the height of each bar
     double barHeight = audioData->matrixHeight * (magnitude / max);
     if (barHeight < 0) barHeight = 0;
     
-    printf("%d ", (int) barHeight);
+    //printf("%d ", (int) barHeight);
+    
+    // Get the colour of the rectangle
+    SDL_Colour *colour = getColour(i, colourList);
     
     //Rectangle length magnitude
     for (int k = 0; k < barHeight; k++) {
-        led_canvas_set_pixel(audioData->offscreen_canvas, i, k, 0xff, 0xff, 0xff);
+        led_canvas_set_pixel(audioData->offscreen_canvas, i, k, colour->r, colour->g, colour->b);
     }
       
   }
   
-  printf("\n");
+  // Changing colour schemes at peaks
+  if (audioData->showPeak && lookForPeaks(audioPeak, audioData)) {
+    nextTheme(colourList);
+  }
+  
+  calculateWaveSpeed(dataHandler);
+  int speed = colourList->volumeSpeed ? colourList->currentWaveSpeed : DEFAULT_WAVE_SPEED;
+  if(WAVE && !(audioData->framePosition % speed)) {
+    colourWave(WAVE_RIGHT, colourList);
+  }
+  
+  //printf("\n");
   audioData->offscreen_canvas = led_matrix_swap_on_vsync(audioData->matrix, audioData->offscreen_canvas);
 }
 
@@ -89,29 +127,17 @@ static void displayToGUI(dataHandler_t *dataHandler) {
   // Draw time
   if (audioData->showTime) drawTimeText(dataHandler);
 
-  // Changing colour schemes at peaks
-  if (audioData->showPeak) {
-    double audioPeak = audioData->maxFrameMagnitude[audioData->framePosition]
-                       / audioData->maxMagnitude;
-    if (!audioData->peakOn && audioData->peakCounter < PEAK_SIZE &&
-        audioPeak > PEAK_THRESHOLD) {
-      audioData->peakOn = true;
-      nextTheme(colourList);
-    }
-    if (audioData->peakOn) {
-      audioData->peakCounter++;
-      if (audioData->peakCounter >= PEAK_SIZE) {
-        audioData->peakOn = false;
-        audioData->peakCounter = 0;
-      }
-    }
-  }
 
+  double audioPeak = 0;
+  
   for (int i = 0; i < NUM_OF_BINS; i++) {
     // Get the magnitude of the current bin
     double magnitude = updateBandBuffer(audioData, i);
     double max = audioData->localMax ? audioData->maxBinMagnitude[i]
                                      : audioData->maxMagnitude;
+                                     
+    if (magnitude / max > audioPeak)
+      audioPeak = magnitude / max;
     // Get the height of each bar
     double barHeight = MAX_BAR_HEIGHT * (magnitude / max);
     if (barHeight < 0) barHeight = 0;
@@ -121,7 +147,7 @@ static void displayToGUI(dataHandler_t *dataHandler) {
                      MAX_BAR_HEIGHT - barHeight + V_PADDING + TOP_PADDING,
                      BAR_WIDTH - 1, // -1 makes a gap between each bar
                      barHeight};
-    // Set the colour of the rectangle
+    // Get the colour of the rectangle
     SDL_Colour *colour = getColour(i, colourList);
     // printf("Colour %d: (%d, %d, %d)\n", i, colour->r, colour->g, colour->b);
     SDL_SetRenderDrawColor(gui->renderer, colour->r, colour->g, colour->b,
@@ -131,6 +157,11 @@ static void displayToGUI(dataHandler_t *dataHandler) {
     SDL_RenderFillRect(gui->renderer, &rect);
   }
 
+  // Changing colour schemes at peaks
+  if (audioData->showPeak && lookForPeaks(audioPeak, audioData)) {
+    nextTheme(colourList);
+  }
+  
   calculateWaveSpeed(dataHandler);
   int speed = colourList->volumeSpeed ? colourList->currentWaveSpeed : DEFAULT_WAVE_SPEED;
   if(WAVE && !(audioData->framePosition % speed)) {
@@ -157,7 +188,18 @@ void visualiseCallback(void *userData, Uint8 *audioBuffer, int frameSize) {
     //displayToGUI(dataHandler);
   //}
   
-  displayToPi(data);
+  switch(dataHandler->outputType) {
+    case GUI:
+      displayToGUI(dataHandler);
+      break;
+    case PI:
+      displayToPi(dataHandler);
+      break;
+    case TERMINAL:
+      displayToTerminal(data);
+      break;
+  }
+  
 
   // Store the number of bytes to be retrieved in length
   Uint32 length = (Uint32) frameSize;

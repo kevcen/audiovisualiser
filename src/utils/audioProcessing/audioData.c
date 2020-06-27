@@ -14,7 +14,7 @@ void allocateFFT(audioData_t *audioData) {
   int channels = audioData->audioSpec.channels;
 
   // Allocate array of fft members for each channel
-  audioData->fft = (fft *) malloc(channels * sizeof(fft));
+  audioData->fft = (fft_t *) malloc(channels * sizeof(fft_t));
   if (!audioData->fft) {
     perror("Memory allocation to fast fourier transform failed");
     exit(EXIT_FAILURE);
@@ -120,8 +120,7 @@ void initialiseLEDs(audioData_t *audioData, int *argc, char ***argv) {
       &(audioData->matrixWidth), &(audioData->matrixHeight));
       
   
-  fprintf(stderr, "Size: %dx%d. Hardware gpio mapping: %s\n",
-          audioData->matrixWidth, audioData->matrixHeight, options.hardware_mapping);
+  audioData->colourCounter = 0;
           
         
 }
@@ -195,13 +194,15 @@ void prepareAudioData(SDL_AudioDeviceID *audioDevice, Uint8 **outputBuffer,
   audioData->showTime = false;
 
   // Use local max or not
-  audioData->localMax = false;
+  audioData->localMax = true;
 
   audioData->peakOn = false;
   audioData->peakCounter = 0;
-  audioData->showPeak = false;
+  audioData->showPeak = true;
 
-  initialiseLEDs(audioData, argc, argv);
+  if (dataHandler->outputType == PI)
+    initialiseLEDs(audioData, argc, argv);
+    
   // Set the output buffer to point to the audioBuffer to be later free'd
   *outputBuffer = audioBuffer;
 }

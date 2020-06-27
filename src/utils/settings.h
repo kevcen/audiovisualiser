@@ -19,7 +19,8 @@
 #define WAVE_SPEED_THRESHOLD 7
 #define WAVE_SPEED_MULTIPLIER 1.5
 #define PEAK_SIZE 8
-#define PEAK_THRESHOLD 0.72
+#define PEAK_THRESHOLD 0.75
+#define PEAK_ALL_THRESHOLD 0.3
 
 // File information
 #define SUBDIR "../assets/audio/"
@@ -40,7 +41,7 @@
 #define SAMPLES_PER_FRAME 4096
 #define LOWEST_FREQ 100
 #define HIGHEST_FREQ 12000
-#define THICKNESS_OF_BAR 2
+#define THICKNESS_OF_BAR 1
 #define FFT_OUTPUT_MULTIPLIER 0.25
 
 

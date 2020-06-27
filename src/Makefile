@@ -7,7 +7,7 @@ LDFLAGS =`sdl2-config --libs`
 LDFLAGS += -lm -lSDL2_ttf -lfftw3
 OBJS = main.o utils/audioProcessing/audioData.o utils/audioProcessing/sampler.o utils/audioProcessing/wavProcessor.o utils/fft/fftCalculator.o utils/visualiser/visualiser.o  utils/gui/gui.o utils/gui/playButton.o utils/gui/colourPicker.o utils/gui/audioText.o
 
-RGB_LIB_DISTRIBUTION=rpi-rgb-led-matrix
+RGB_LIB_DISTRIBUTION=../rpi-rgb-led-matrix
 RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
 RGB_LIBRARY_NAME=rgbmatrix

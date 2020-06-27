@@ -15,8 +15,9 @@ dataHandler_t dataHandler;
 SDL_AudioDeviceID audioDevice; // Device used to play the audio
 Uint8 *audioBuffer; // The large buffer which will store all audio data
 
-void cleanup() {
-  led_matrix_delete(dataHandler.audioData->matrix);
+void cleanup(void) {
+  if(dataHandler.outputType == PI)
+    led_matrix_delete(dataHandler.audioData->matrix);
 
   // fftw cleanup
   fftw_cleanup();
@@ -24,12 +25,12 @@ void cleanup() {
   // SDL cleanup
   SDL_FreeWAV(audioBuffer);
   SDL_CloseAudioDevice(audioDevice);
-  if(!dataHandler.terminal) {
+  if(dataHandler.outputType == GUI) {
     SDL_DestroyRenderer(dataHandler.gui->renderer);
     SDL_DestroyWindow(dataHandler.gui->window);
-  }
+    TTF_CloseFont(dataHandler.gui->font);
+  } 
   SDL_Quit();
-  TTF_CloseFont(dataHandler.gui->font);
   TTF_Quit();
   // Free the memory allocated for the colour list
   freeColourList(dataHandler.colourList);
@@ -38,8 +39,10 @@ void cleanup() {
 }
 
 
-void sig_handler(int signum){
+void sig_handler(int sigInt){
   cleanup();
+  
+  printf("Hope you enjoyed.\n");
 }
 
 
@@ -52,9 +55,13 @@ int main(int argc, char **argv) {
     fprintf(stderr, "File name not specified\n");
     return EXIT_FAILURE;
   }
-  bool terminal = false;
-  if (argc >= 3 && !strcmp("terminal", argv[2])) {
-    terminal = true;
+  outputType_t outputType = GUI;
+  if (argc >= 3) {
+    if(!strcmp("terminal", argv[2])) {
+      outputType = TERMINAL;
+    } else if(!strcmp("pi", argv[2])) {
+      outputType = PI;
+    }
   }
 
   // Start with the subdirectory path for the audio paths
@@ -72,10 +79,10 @@ int main(int argc, char **argv) {
   dataHandler.audioData = &audioData;
   dataHandler.gui = &gui;
   dataHandler.colourList = &colourList;
-  dataHandler.terminal = terminal;
+  dataHandler.outputType = outputType;
 
   prepareColourList(&colourList);
-  prepareGUI(&dataHandler, terminal);
+  prepareGUI(&dataHandler);
 
   prepareAudioData(&audioDevice, &audioBuffer, &dataHandler, fullFilename,
               &argc, &argv);
@@ -85,7 +92,7 @@ int main(int argc, char **argv) {
 
   bool start = true;
   bool playing = false;
-  if (terminal) {
+  if (outputType != GUI) {
     printf("Press Enter to Play.\n");
     while(getchar() != '\n');
     // Play the audio and wait for the callback to work

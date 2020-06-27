@@ -9,6 +9,9 @@
 
 #include "led-matrix-c.h"
 
+typedef enum {
+  PI, GUI, TERMINAL
+} outputType_t;
 
 typedef struct {
   SDL_Colour colours[MAX_NUM_OF_COLOURS];
@@ -31,7 +34,7 @@ typedef struct {
     fftw_complex *in;
     fftw_complex *out;
     fftw_plan plan;
-} fft;
+} fft_t;
 
 typedef struct {
     SDL_AudioSpec audioSpec; // The struct which holds all important information about the audio
@@ -46,7 +49,7 @@ typedef struct {
   
     int resolution; // Number of bytes per sample which determines the resolution of each sample
 
-    fft *fft; // For each channel, stores the data to calculate Fast Fourier Transform to one frame of data
+    fft_t *fft; // For each channel, stores the data to calculate Fast Fourier Transform to one frame of data
     double **fftResults; // Results of the fft organised in [frame][bin];
     double *bandBuffer; // Stores output of the previous frame
     double *bufferDecrease; // Stores how much the bar heights decrease by
@@ -66,6 +69,7 @@ typedef struct {
     struct RGBLedMatrix *matrix;
     struct LedCanvas *offscreen_canvas;
     int matrixWidth, matrixHeight;
+    int colourCounter;
 } audioData_t;
 
 typedef struct {
@@ -78,7 +82,7 @@ typedef struct {
   audioData_t *audioData;
   gui_t *gui;
   colourList_t *colourList;
-  bool terminal;
+  outputType_t outputType;
 } dataHandler_t;
 
 #endif
