@@ -7,13 +7,26 @@ LDFLAGS =`sdl2-config --libs`
 LDFLAGS += -lm -lSDL2_ttf -lfftw3
 OBJS = main.o utils/audioProcessing/audioData.o utils/audioProcessing/sampler.o utils/audioProcessing/wavProcessor.o utils/fft/fftCalculator.o utils/visualiser/visualiser.o  utils/gui/gui.o utils/gui/playButton.o utils/gui/colourPicker.o utils/gui/audioText.o
 
+RGB_LIB_DISTRIBUTION=rpi-rgb-led-matrix
+RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
+RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
+RGB_LIBRARY_NAME=rgbmatrix
+RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
+LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
+
+
+
 all: main
 
-main: $(OBJS)
-	$(CC) $(OBJS) -o $@  $(LDFLAGS)
+$(RGB_LIBRARY): FORCE
+	$(MAKE) -C $(RGB_LIBDIR)
+	
+	
+main: $(OBJS) $(RGB_LIBRARY)
+	$(CC) $(OBJS) -o $@  $(LDFLAGS) -lstdc++
 
 main.o: main.c utils/dataHandler.h utils/audioProcessing/wavProcessor.h utils/gui/playButton.h utils/audioProcessing/audioData.h utils/gui/colourPicker.h utils/gui/gui.h utils/settings.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) -I$(RGB_INCDIR) $(CFLAGS) -c $< -o $@
 
 utils/audioProcessing/audioData.o: utils/audioProcessing/audioData.c utils/audioProcessing/audioData.h utils/dataHandler.h utils/audioProcessing/wavProcessor.h utils/visualiser/visualiser.h utils/settings.h
 	cd utils; make audioProcessing/audioData.o
@@ -46,3 +59,6 @@ utils/gui/audioText.o: utils/gui/audioText.c utils/gui/audioText.h utils/gui/gui
 clean:
 	/bin/rm -rf *.o main
 	cd utils; make clean
+
+FORCE:
+.PHONY: FORCE

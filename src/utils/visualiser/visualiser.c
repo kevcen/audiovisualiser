@@ -5,6 +5,7 @@
 #include "audioText.h"
 
 
+
 static double updateBandBuffer(audioData_t *audioData, int band) {
   double *fftResults = &audioData->fftResults[audioData->framePosition][band];
   if (audioData->buffer) {
@@ -27,6 +28,30 @@ static double updateBandBuffer(audioData_t *audioData, int band) {
   return *fftResults;
 }
 
+static void displayToPi(audioData_t *audioData) {
+  led_canvas_clear(audioData->offscreen_canvas);
+
+  // Output the height for each band
+  for (int i = 0; i < NUM_OF_BINS; i++) {
+    double magnitude = updateBandBuffer(audioData, i);
+    double max = audioData->maxBinMagnitude[i];
+                                     
+    // Get the height of each bar
+    double barHeight = audioData->matrixHeight * (magnitude / max);
+    if (barHeight < 0) barHeight = 0;
+    
+    printf("%d ", (int) barHeight);
+    
+    //Rectangle length magnitude
+    for (int k = 0; k < barHeight; k++) {
+        led_canvas_set_pixel(audioData->offscreen_canvas, i, k, 0xff, 0xff, 0xff);
+    }
+      
+  }
+  
+  printf("\n");
+  audioData->offscreen_canvas = led_matrix_swap_on_vsync(audioData->matrix, audioData->offscreen_canvas);
+}
 
 static void displayToTerminal(audioData_t *audioData) {
   // Clear terminal
@@ -124,13 +149,15 @@ void visualiseCallback(void *userData, Uint8 *audioBuffer, int frameSize) {
   // If there is no more audioRemaining
   if (data->audioRemaining <= 0) return;
 
-  if (dataHandler->terminal) {
+  //if (dataHandler->terminal) {
     // Display the GUI to terminal
-    displayToTerminal(data);
-  } else {
+    //displayToTerminal(data);
+  //} else {
     // Visualise the output to gui./m
-    displayToGUI(dataHandler);
-  }
+    //displayToGUI(dataHandler);
+  //}
+  
+  displayToPi(data);
 
   // Store the number of bytes to be retrieved in length
   Uint32 length = (Uint32) frameSize;

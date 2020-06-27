@@ -7,6 +7,9 @@
 #include "settings.h"
 
 
+#include "led-matrix-c.h"
+
+
 typedef struct {
   SDL_Colour colours[MAX_NUM_OF_COLOURS];
   int numberOfColours;
@@ -59,6 +62,10 @@ typedef struct {
     bool buffer;
     bool showTime;
     bool localMax;
+    
+    struct RGBLedMatrix *matrix;
+    struct LedCanvas *offscreen_canvas;
+    int matrixWidth, matrixHeight;
 } audioData_t;
 
 typedef struct {

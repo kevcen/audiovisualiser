@@ -4,7 +4,8 @@
 #include "dataHandler.h"
 
 void prepareAudioData(SDL_AudioDeviceID *audioDevice, Uint8 **outputBuffer,
-                      dataHandler_t *dataHandler, char *filename);
+                      dataHandler_t *dataHandler, char *filename,
+                      int *argc, char ***argv);
 
 void freeAudioData(audioData_t *audioData);
 int getNumOfFrames(audioData_t *audioData, Uint32 length);

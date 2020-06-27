@@ -98,9 +98,36 @@ void freeAudioData(audioData_t *audioData) {
   free(audioData->maxFrameMagnitude);
   free(audioData->maxBinMagnitude);
 }
+void initialiseLEDs(audioData_t *audioData, int *argc, char ***argv) {
+  struct RGBLedMatrixOptions options;
+  
+  memset(&options, 0, sizeof(options));
+  
+  options.rows = 32;
+  options.chain_length = 1;
+  
+  audioData->matrix = led_matrix_create_from_options(&options, argc, argv);
+  
+  if (audioData->matrix == NULL) {
+    fprintf(stderr, "Matrix could not be created");
+    exit(EXIT_FAILURE);
+  }
+  
+  
+  audioData->offscreen_canvas = led_matrix_create_offscreen_canvas(audioData->matrix);
 
+  led_canvas_get_size(audioData->offscreen_canvas,
+      &(audioData->matrixWidth), &(audioData->matrixHeight));
+      
+  
+  fprintf(stderr, "Size: %dx%d. Hardware gpio mapping: %s\n",
+          audioData->matrixWidth, audioData->matrixHeight, options.hardware_mapping);
+          
+        
+}
 void prepareAudioData(SDL_AudioDeviceID *audioDevice, Uint8 **outputBuffer,
-                      dataHandler_t *dataHandler, char *filename) {
+                      dataHandler_t *dataHandler, char *filename,
+                      int *argc, char ***argv) {
 
 
   audioData_t *audioData = dataHandler->audioData;
@@ -168,12 +195,13 @@ void prepareAudioData(SDL_AudioDeviceID *audioDevice, Uint8 **outputBuffer,
   audioData->showTime = false;
 
   // Use local max or not
-  audioData->localMax = true;
+  audioData->localMax = false;
 
   audioData->peakOn = false;
   audioData->peakCounter = 0;
   audioData->showPeak = false;
 
+  initialiseLEDs(audioData, argc, argv);
   // Set the output buffer to point to the audioBuffer to be later free'd
   *outputBuffer = audioBuffer;
 }

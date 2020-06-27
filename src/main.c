@@ -8,8 +8,45 @@
 #include "settings.h"
 #include "audioText.h"
 
+#include<signal.h>
+#include<unistd.h>
+
+dataHandler_t dataHandler;
+SDL_AudioDeviceID audioDevice; // Device used to play the audio
+Uint8 *audioBuffer; // The large buffer which will store all audio data
+
+void cleanup() {
+  led_matrix_delete(dataHandler.audioData->matrix);
+
+  // fftw cleanup
+  fftw_cleanup();
+
+  // SDL cleanup
+  SDL_FreeWAV(audioBuffer);
+  SDL_CloseAudioDevice(audioDevice);
+  if(!dataHandler.terminal) {
+    SDL_DestroyRenderer(dataHandler.gui->renderer);
+    SDL_DestroyWindow(dataHandler.gui->window);
+  }
+  SDL_Quit();
+  TTF_CloseFont(dataHandler.gui->font);
+  TTF_Quit();
+  // Free the memory allocated for the colour list
+  freeColourList(dataHandler.colourList);
+  // Free the members of audio data
+  freeAudioData(dataHandler.audioData);
+}
+
+
+void sig_handler(int signum){
+  cleanup();
+}
+
 
 int main(int argc, char **argv) {
+  signal(SIGINT,sig_handler); // Register signal handler
+  
+  
   // Handle arguments of main
   if (argc < 2) {
     fprintf(stderr, "File name not specified\n");
@@ -26,19 +63,22 @@ int main(int argc, char **argv) {
   strcat(fullFilename, argv[1]);
 
 
-  SDL_AudioDeviceID audioDevice; // Device used to play the audio
-  Uint8 *audioBuffer; // The large buffer which will store all audio data
 
   // Initialise a data structure containing the required data for the callback
   audioData_t audioData;
   gui_t gui;
   colourList_t colourList;
-  dataHandler_t dataHandler = {&audioData, &gui, &colourList, terminal};
+  //dataHandler = {&audioData, &gui, &colourList, terminal};
+  dataHandler.audioData = &audioData;
+  dataHandler.gui = &gui;
+  dataHandler.colourList = &colourList;
+  dataHandler.terminal = terminal;
 
   prepareColourList(&colourList);
   prepareGUI(&dataHandler, terminal);
 
-  prepareAudioData(&audioDevice, &audioBuffer, &dataHandler, fullFilename);
+  prepareAudioData(&audioDevice, &audioBuffer, &dataHandler, fullFilename,
+              &argc, &argv);
 
   // With the data structure, calculate the FFT calculations and store it in a array of values per frame
   processWavFile(&audioData);
@@ -123,24 +163,7 @@ int main(int argc, char **argv) {
   }
 
 
-
-  // fftw cleanup
-  fftw_cleanup();
-
-  // SDL cleanup
-  SDL_FreeWAV(audioBuffer);
-  SDL_CloseAudioDevice(audioDevice);
-  if(!terminal) {
-    SDL_DestroyRenderer(gui.renderer);
-    SDL_DestroyWindow(gui.window);
-  }
-  SDL_Quit();
-  TTF_CloseFont(gui.font);
-  TTF_Quit();
-  // Free the memory allocated for the colour list
-  freeColourList(dataHandler.colourList);
-  // Free the members of audio data
-  freeAudioData(&audioData);
+  cleanup();
 
   printf("Hope you enjoyed.\n");
   return EXIT_SUCCESS;

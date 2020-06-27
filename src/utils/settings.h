@@ -7,7 +7,7 @@
 #define FRAMES_TO_SKIP 20
 
 // Colour information
-#define NUM_BLEND 5 //how many colours to blend
+#define NUM_BLEND 4 //how many colours to blend
 #define NUM_OF_PALETTES 7
 #define MAX_NUM_OF_COLOURS 7
 #define MAX_PALETTE_LABEL 30
@@ -35,7 +35,7 @@
 #define MAX_BAR_HEIGHT (HEIGHT - 2 * V_PADDING - TOP_PADDING)
 
 // Audio processing information
-#define BIN_MULTIPLIER 10
+#define BIN_MULTIPLIER 8
 #define NUM_OF_BINS (NUM_BLEND * BIN_MULTIPLIER)
 #define SAMPLES_PER_FRAME 4096
 #define LOWEST_FREQ 100
