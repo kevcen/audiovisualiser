@@ -14,7 +14,7 @@ This project uses SDL2 and its TrueType font library for the UI and FFTW3 for th
 - FFTW3: http://www.fftw.org/download.html
 
 ### Compile
-Run the makefile inside the src directory using `make` to compile the source files.
+Run the makefile inside the `src` directory using `make` to compile the source files.
 
 ## Usage
 ### Running 
