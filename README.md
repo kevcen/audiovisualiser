@@ -43,6 +43,6 @@ Add `terminal` to the end of the run command like this: `./main songName.wav ter
 
 [Wire up](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/wiring.md) your Rasberry Pi with the RGB LED matrix and the [power supply](https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/powering) with the LED matrix.
 
-You cannot use your [on-board sound card](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/README.md#Troubleshooting) so use an [external USB sound card](https://raspberrypi.stackexchange.com/questions/80072/how-can-i-use-an-external-usb-sound-card-and-set-it-as-default) and set your Raspberry Pi to use it by default.
+You cannot use your [on-board sound card](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/README.md#use-minimal-raspbian-distribution) so use an [external USB sound card](https://raspberrypi.stackexchange.com/questions/80072/how-can-i-use-an-external-usb-sound-card-and-set-it-as-default) and set your Raspberry Pi to use it by default.
 
 Then, simply add `pi` to the end of the run command like this: `sudo ./main songName.wav pi` (root permissions will be required to make the H. Zeller's library work properly)
