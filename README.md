@@ -39,7 +39,7 @@ x - exit
 Add `terminal` to the end of the run command like this: `./main songName.wav terminal`
 
 ### Running on a Raspberry Pi
-![RPIDemo](https://i.imgur.com/A8ye8U3.gif)
+![RPIDemo](https://i.imgur.com/gvcS89g.gif)
 
 [Wire up](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/wiring.md) your Rasberry Pi with the RGB LED matrix and the [power supply](https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/powering) with the LED matrix.
 
