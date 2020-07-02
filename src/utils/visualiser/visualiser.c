@@ -59,7 +59,7 @@ static void displayToPi(dataHandler_t *dataHandler) {
     double magnitude = updateBandBuffer(audioData, i);
     //Fade in 
   
-    if (frameMultiplier < 1) {
+    if (frameMultiplier < -1) {
       printf("frame %d", audioData->framePosition);
       magnitude *= frameMultiplier / 2;
     }
