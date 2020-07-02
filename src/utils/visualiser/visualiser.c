@@ -52,17 +52,27 @@ static void displayToPi(dataHandler_t *dataHandler) {
   
   led_canvas_clear(audioData->offscreen_canvas);
 
+  double frameMultiplier = (double) audioData->framePosition / FADE_FRAMES;
   double audioPeak = 0;
   // Output the height for each band
   for (int i = 0; i < NUM_OF_BINS; i++) {
     double magnitude = updateBandBuffer(audioData, i);
-    double max = audioData->maxBinMagnitude[i];
+    //Fade in 
+  
+    if (frameMultiplier < 1) {
+      printf("frame %d", audioData->framePosition);
+      magnitude *= frameMultiplier / 2;
+    }
+    //double max = audioData->maxBinMagnitude[i];
+    //double max = audioData->maxMagnitude;
+    double max = ((MAX_RATIO - 1) * audioData->maxBinMagnitude[i] + audioData->maxMagnitude) / MAX_RATIO;
     if (magnitude / max > audioPeak)
       audioPeak = magnitude / max;
                           
     // Get the height of each bar
-    double barHeight = audioData->matrixHeight * (magnitude / max);
+    double barHeight = audioData->matrixHeight * (magnitude / max) * HEIGHT_MULTIPLIER;
     if (barHeight < 0) barHeight = 0;
+    if (barHeight > audioData->matrixHeight) barHeight = audioData->matrixHeight;
     
     //printf("%d ", (int) barHeight);
     
@@ -71,7 +81,7 @@ static void displayToPi(dataHandler_t *dataHandler) {
     
     //Rectangle length magnitude
     for (int k = 0; k < barHeight; k++) {
-        led_canvas_set_pixel(audioData->offscreen_canvas, i, k, colour->r, colour->g, colour->b);
+        led_canvas_set_pixel(audioData->offscreen_canvas, i, audioData->matrixHeight-k, colour->r, colour->g, colour->b);
     }
       
   }

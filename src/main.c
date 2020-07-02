@@ -39,15 +39,15 @@ void cleanup(void) {
 }
 
 
-void sig_handler(int sigInt){
+void sigHandler(int sig){
+  if (sig == SIGINT) printf("Exit detected, cleaning up program.");
   cleanup();
-  
   printf("Hope you enjoyed.\n");
 }
 
 
 int main(int argc, char **argv) {
-  signal(SIGINT,sig_handler); // Register signal handler
+  signal(SIGINT, sigHandler); // Register signal handler
   
   
   // Handle arguments of main
@@ -93,8 +93,10 @@ int main(int argc, char **argv) {
   bool start = true;
   bool playing = false;
   if (outputType != GUI) {
-    printf("Press Enter to Play.\n");
-    while(getchar() != '\n');
+    if (outputType == TERMINAL) {
+      printf("Press Enter to Play.\n");
+      while(getchar() != '\n');
+    }
     // Play the audio and wait for the callback to work
     SDL_PauseAudioDevice(audioDevice, 0);
     // Block the program whilst there is still audio remaining

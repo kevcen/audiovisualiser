@@ -19,7 +19,7 @@
 #define WAVE_SPEED_THRESHOLD 7
 #define WAVE_SPEED_MULTIPLIER 1.5
 #define PEAK_SIZE 8
-#define PEAK_THRESHOLD 0.75
+#define PEAK_THRESHOLD 0.60
 #define PEAK_ALL_THRESHOLD 0.3
 
 // File information
@@ -43,6 +43,9 @@
 #define HIGHEST_FREQ 12000
 #define THICKNESS_OF_BAR 1
 #define FFT_OUTPUT_MULTIPLIER 0.25
+#define MAX_RATIO 6
+#define HEIGHT_MULTIPLIER 1.3
+#define FADE_FRAMES 160
 
 
 // Play button information
