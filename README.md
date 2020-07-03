@@ -2,6 +2,7 @@
 
 ![Demo](/assets/images/demo.gif)
 
+Watch the LED matrix demo on [YouTube](https://www.youtube.com/watch?v=EV6f_il4w6A).
 
 ## Installation
 ### Download the submodules
