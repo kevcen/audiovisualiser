@@ -19,7 +19,7 @@ This project uses SDL2 and its TrueType font library for the UI and FFTW3 for th
 Navigate inside the `src` directory and run `make` to compile the source files.
 
 ## Usage
-### Running 
+### Running on a GUI
 `./main songName.wav`
 
 To add your own audio wav files, place them under the assets/audio directory.
